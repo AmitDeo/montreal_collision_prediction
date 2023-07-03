@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "montreal-collision-prediction"
+version = "0.1.0b1"
+description = ""
+authors = [
+    "Phailendra Deo <magpie.arise@gmail.com>",
+    "Ali <ali@gmail.com>",
+    "Rodion <roadion@gmail.com>"
+]
+readme = "README.md"
+packages = [{include = "com", from = "src"}]
+repository = "git@github.com:AmitDeo/montreal_collision_prediction.git"
+
+[tool.poe.tasks]
+start = "uvicorn com.api.main:main --port 8001 --reload"
+"reformat-code" = "sh -c 'pre-commit install && pre-commit run --all-files'"
+
+[tool.poetry.scripts]
+train-model = "com.models.main:app"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+numpy = "^1.23.5"
+opencv-python = "^4.7.0.72"
+tensorflow = "^2.12"
+streamlit = "^1.20.0"
+scikit-learn = "^1.2.2"
+uvicorn = "^0.20.0"
+fastapi = "~0.95.1"
+fastapi-rfc7807 = "~0.5.0"
+httpx = "^0.23.3"
+pandas = "^2.0.3"
+typer = "^0.9.0"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.0.0"
+poethepoet = "^0.18.1"
+black = "^22.12.0"
+faker = "^16.9.0"
+isort = "^5.12.0"
+pre-commit = "^3.3.2"
+autoflake = "^2.1.1"
+pydash = "^6.0.2"
+python-dotenv = "^1.0.0"
+pytest-asyncio = "^0.21.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+skip-magic-trailing-comma = true
+
+[tool.isort]
+profile = "black"
