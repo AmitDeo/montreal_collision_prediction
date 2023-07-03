@@ -391,3 +391,5 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,pycharm,python,jupyternotebooks,macos,windows,linux
 *.db
 data
+*.pem
+saved_models

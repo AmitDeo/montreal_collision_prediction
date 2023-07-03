@@ -1,11 +1,13 @@
 import os
 
 import joblib
+import numpy as np
 import pandas as pd
+import tensorflow as tf
 from keras import backend as K
 from keras.layers import Dense, Dropout
 from keras.metrics import Precision, Recall
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
@@ -20,7 +22,7 @@ class TensorflowSequentialModel(BaseModel):
 
     def __init__(
         self,
-        input_dim: int = 575,
+        input_dim: int = 574,
         output_dim: int = 2,
         epochs: int = 20,
         batch_size: int = 32,
@@ -52,6 +54,10 @@ class TensorflowSequentialModel(BaseModel):
         """
         Define the model
         """
+
+        tf.config.run_functions_eagerly(True)
+        tf.data.experimental.enable_debug_mode()
+
         self.model = Sequential(
             [
                 Dense(64, input_shape=(self.input_dim,), activation="relu"),
@@ -74,7 +80,7 @@ class TensorflowSequentialModel(BaseModel):
         )
         self.model.summary()
 
-    def train(self, X: pd.DataFrame, y: pd.DataFrame) -> dict:
+    def train(self, X: np.array, y: np.array) -> dict:
         """
         Train the model.
         """
@@ -87,13 +93,13 @@ class TensorflowSequentialModel(BaseModel):
         if not os.path.exists(self.model_path):
             os.makedirs(self.model_path)
 
-        self.model.save_weights(self.model_path)
+        self.model.save(self.model_path)
 
     def load(self):
         if not os.path.exists(self.model_path):
             raise FileNotFoundError("Model folder does not exist")
 
-        self.model.save_weights(self.model_path)
+        self.model = load_model(self.model_path)
 
     def create_dataset(self, df: pd.DataFrame) -> tuple:
         """Create dataset based on model"""
@@ -101,7 +107,6 @@ class TensorflowSequentialModel(BaseModel):
 
         X = df.drop(
             labels=[
-                "Unnamed: 0",
                 "date_accdn",
                 "has_accident",
                 "GridName",
@@ -119,7 +124,6 @@ class TensorflowSequentialModel(BaseModel):
         )
 
         X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
-
         scaler = MinMaxScaler()
         X_train_normalized = scaler.fit_transform(X_train)
 

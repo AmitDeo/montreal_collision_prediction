@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Run Typer Command",
+        "type": "python",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/src/com/models",
+        "module": "main",
+        "args": ["evaluate", "xgboost"],
+        "console": "integratedTerminal"
+      }
+    ]
+  }

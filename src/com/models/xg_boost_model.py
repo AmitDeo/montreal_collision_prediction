@@ -1,41 +1,48 @@
 import os
-import pickle
 
 import joblib
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
+from xgboost import XGBClassifier
 
 from com.models.base_model import BaseModel
 
 
-class LogisticRegressionModel(BaseModel):
+class XGBoostModel(BaseModel):
     """
-    Logistic regression model
+    XG Boot Model
     """
 
     def __init__(
         self,
-        penalty: str = "l1",
-        solver: str = "liblinear",
+        objective: str = "binary:logistic",
         random_state: int = 0,
         verbose: int = 0,
+        n_estimators: int = 100,
+        max_depth: int = 3,
+        learning_rate: float = 0.01,
     ):
         super().__init__()
 
         self.model = None
-        self.penalty = penalty
+        self.objective = objective
         self.random_state = random_state
         self.verbose = verbose
-        self.solver = solver
+        self.n_estimators = n_estimators
+        self.max_depth = max_depth
+        self.learning_rate = learning_rate
 
     def define(self) -> None:
         """
         Define the model
         """
-        self.model = LogisticRegression(
-            penalty=self.penalty, solver=self.solver, verbose=self.verbose
+        self.model = XGBClassifier(
+            n_estimators=self.n_estimators,
+            max_depth=self.max_depth,
+            learning_rate=self.learning_rate,
+            objective=self.objective,
+            random_state=self.random_state,
         )
 
     def train(self, X: pd.DataFrame, y: pd.DataFrame) -> None:
@@ -45,15 +52,14 @@ class LogisticRegressionModel(BaseModel):
         self.model.fit(X, y)
 
     def save(self):
-        with open(f"{self.model_path}/model_pkl", "wb") as f:
-            pickle.dump(self.model, f)
+        self.model.save_model(f"{self.model_path}/xgb_model.json")
 
     def load(self):
-        if not os.path.exists(self.model_path):
-            raise FileNotFoundError("Model folder does not exist")
+        model_file = f"{self.model_path}/xgb_model.json"
+        if not os.path.exists(model_file):
+            raise FileNotFoundError("Saved model not found")
 
-        with open(f"{self.model_path}/model_pkl", "wb") as f:
-            self.model = pickle.load(self.model, f)
+        self.model.load_model(model_file)
 
     def create_dataset(self, df: pd.DataFrame) -> tuple:
         """Create dataset based on model"""
