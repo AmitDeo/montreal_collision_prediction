@@ -85,7 +85,11 @@ class TensorflowSequentialModel(BaseModel):
         Train the model.
         """
         history = self.model.fit(
-            X, y, batch_size=self.batch_size, epochs=self.epochs, validation_split=self.epochs
+            X,
+            y,
+            batch_size=self.batch_size,
+            epochs=self.epochs,
+            validation_split=self.validation_split,
         )
         self.history = history
 
